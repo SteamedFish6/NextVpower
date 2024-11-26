@@ -20,7 +20,7 @@ posAW(K0)=[];
 P(K0,:)=[];
 
 
-% Filter some ¡°old¡± lineages with fewer than 20 mutation sites 
+% Filter some "old" lineages with fewer than 20 mutation sites 
 % "20" is an adjustable parametersparameter   
 SUMAR=sum(A,2);
 M=find(SUMAR<=20);
