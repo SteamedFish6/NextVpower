@@ -29,7 +29,7 @@ Output files should be `usher_barcodes.csv` and `var_anno.csv`.
 unzip usher_barcodes.zip
 ```
 ```sh
-unzip var_anno.tsv
+unzip var_anno.zip
 ```
 5.Run python command to check installation and see help.
 ```sh
