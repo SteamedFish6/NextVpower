@@ -96,7 +96,7 @@ Wastewater multiplex PCR amplicon sequencing revealed community transmission of 
 
 Publications
 ------------
-This project was not published yet —— but you can still have a try on your SARS-CoV-2 amplicon data.
+This project was not published yet —— but you can still have a try on your SARS-CoV-2 multiplex sequencing data.
 
 License
 -------
