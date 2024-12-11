@@ -40,7 +40,7 @@ unzip usher_barcodes.zip
 ```sh
 unzip var_anno.zip
 ```
- - For Windows, please unzip these two files to the folder where they are located.
+ - For Windows, please unzip these two files to the folder where they are current located.
 
 5.Run python command to check installation and see help.
 ```sh
