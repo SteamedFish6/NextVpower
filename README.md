@@ -7,7 +7,7 @@ Basic flow sheet:
 ---------------
 ![image](https://github.com/user-attachments/assets/8471c6cc-c55c-4156-81a8-8c379aaa2b2e)
 
-Note: Read numbers indicate adjustable parameters. Green numbers may change according to your sequencing data and the updating of the barcode matrix A.
+Note: Red numbers indicate adjustable parameters. Green numbers may change according to your sequencing data and the updating of the barcode matrix A.
 
 
 Requirements:
