@@ -120,17 +120,17 @@ def convertVcf2DF(vcfname: str) -> pd.DataFrame:
                             if alt_len > 1:
                                 alt = alt[-1]
                                 ref = ref[alt_len-1:]
-                                pos_str = str(eval(pos_str) + alt_len - 1)
+                                new_pos_str = str(eval(pos_str) + alt_len - 1)
                         elif typ == 'ins':
                             ref_len = len(ref)
                             if ref_len > 1:
                                 ref = ref[-1]
                                 alt = alt[ref_len-1:]
-                                pos_str = str(eval(pos_str) + ref_len - 1)
+                                new_pos_str = str(eval(pos_str) + ref_len - 1)
                         
                         base_change = ref + pos_str + alt
                         depth = "{}:{} {}:{}".format(alt, ao, ref, ro)
-                        df.loc[base_change] = pd.Series({"Position": pos_str, "Type": typ, "REF Base": ref, "ALT Base": alt, "Depth": depth, "MAF": maf})
+                        df.loc[base_change] = pd.Series({"Position": new_pos_str, "Type": typ, "REF Base": ref, "ALT Base": alt, "Depth": depth, "MAF": maf})
     df["MAF"] = df["MAF"].astype("float64") #change dtype of column in pd.DataFrame
     return df
 
