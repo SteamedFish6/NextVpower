@@ -405,7 +405,6 @@ if __name__ == "__main__":
         for fname in collectFile(fpath, fullpath=True, ftype='vcf'):
             VcfDF = convertVcf2DF(fname)
             spname = os.path.basename(fname).split('.', 1)[0]
-            Var_DF_Dict[spname] = VcfDF
             Var_DF_Dict[spname] = FilterVcfDF(VcfDF, min_depth=params.mindepth)
             
             if params.ann_outpath != None:
