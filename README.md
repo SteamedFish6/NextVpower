@@ -1,7 +1,7 @@
 # NextVpower
 Next V-Power, adapted from "Virus Phylogenetic Resolver of Wastewater-based Epidemiology (V-Power).
 =======
-Next V-Power is a tool for SARS-CoV-2 lineage demixing from multiplex sequencing data, for wastewater and other mixed samples.
+Next V-Power is a tool for multi-virus lineage demixing from amplicon sequencing data, for wastewater and other mixed samples.
 
 Basic flow sheet:
 ---------------
@@ -31,26 +31,32 @@ pip install numpy pandas cvxpy
 ```sh
 cd /path/of/NextVpower #example path
 ```
-4.Unzip `usher_barcodes.zip` and `var_anno.zip` under current directory.
-Output files should be `usher_barcodes.csv` and `var_anno.csv`. 
-Using unpacking software may be more convenient. 
+4.Uncompress `resource.tar.gz` under current directory.
+Output folder should contains `usher_barcodes.csv`, `var_anno.csv`, and other barcodes files like `clade_barcodes_flu_h1n1pdm_ha_CY121680.csv`. 
 ```sh
-unzip usher_barcodes.zip
+tar -zxvf resource.tar.gz
 ```
-```sh
-unzip var_anno.zip
-```
- - For Windows, please unzip these two files to the folder where they are current located.
+ - For Windows, please uncompress the tar.gz file to the folder where they are current located.
 
 5.Run python command to check installation and see help.
 ```sh
 python NextVpower.py -h
 ```
 
+
+> [!IMPORTANT]
+> (Updated on 2025/3/5) Now we have generated barcode matrixes of multi-virus extracted from [NextClade phylogenetic tree](https://github.com/nextstrain/nextclade_data/tree/release). To specify a barcode matrix, please use `-b` parameter to select a file.
+>
+> Apart from demixing sars-cov-2 with usher_barcodes, you can try demixing other kind of viruses with our new barcode matrixes, including IAV, IBV, hmpv, measles, mpox, rsv, dengue and yellow fever.
+>
+> Our barcode extracter tool is now under maintaining and the code is coming soon, then you can update barcode matrixes from NextClades source on time!
+
 > [!NOTE]
 > `usher_barcodes.csv` was generated via [Freyja](https://github.com/andersen-lab/Freyja) and this file was copied from [Freyja repository](https://github.com/andersen-lab/Freyja/blob/main/freyja/data/usher_barcodes.csv).
 >
-> `var_anno.csv` was downloaded from [NGDC: RCoV19 - Variation Annotation](https://ngdc.cncb.ac.cn/ncov/variation/annotation) and I made some format convertion on it.
+> `var_anno.csv` was downloaded from [NGDC: RCoV19 - Variation Annotation](https://ngdc.cncb.ac.cn/ncov/variation/annotation) and we made some format convertion on it.
+>
+> Unlike Freyja, NextVpower takes into account INDEL-type mutations when processing input data, which may provide more accurate lineage demixing results. Also, NextVpower can detect the potential mutation sites of each sample.
 
 > [!NOTE]
 > `Vpower.m` and `Vpower2.m` are MATLAB scripts of V-Power.
@@ -92,11 +98,11 @@ Wastewater multiplex PCR amplicon sequencing revealed community transmission of 
 > 
 > - 1.Align sample.reads.fq to NC_045512_Hu-1.fasta (or MN908947.3.fasta) by running `bwa mem`, `samtools sort` and `samtools view`, to generate sample.bam.
 > 
-> - 2.Use variant calling tools (freebayes, bcftools, etc.) to generate sample.vcf from sample.bam.
+> - 2.Use variant calling tools ([freebayes](https://github.com/freebayes/freebayes) is recommended) to generate sample.vcf from sample.bam.
 
 Publications
 ------------
-This project was not published yet —— but you can still have a try on your SARS-CoV-2 multiplex sequencing data.
+This project was not published yet —— but you can still have a try on your virus amplicon sequencing data.
 
 License
 -------
