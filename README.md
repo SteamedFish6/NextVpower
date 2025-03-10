@@ -54,7 +54,7 @@ python NextVpower.py -h
 > [!NOTE]
 > `usher_barcodes.csv` was generated via [Freyja](https://github.com/andersen-lab/Freyja) and this file was copied from [Freyja repository](https://github.com/andersen-lab/Freyja/blob/main/freyja/data/usher_barcodes.csv).
 >
-> `var_anno.csv` was downloaded from [NGDC: RCoV19 - Variation Annotation](https://ngdc.cncb.ac.cn/ncov/variation/annotation) and we made some format convertion on it.
+> `var_anno.csv` was downloaded from [NGDC: RCoV19 - Variation Annotation](https://ngdc.cncb.ac.cn/ncov/variation/annotation) and we made some format convertion on it (Only for sars-cov-2 annotation).
 >
 > Unlike Freyja, NextVpower takes into account INDEL-type mutations when processing input data, which may provide more accurate lineage demixing results. Also, NextVpower can detect the potential mutation sites of each sample.
 
@@ -72,7 +72,7 @@ python NextVpower.py -i PP_raw_example.tsv -o demix_result_example.tsv
 ```
 2. Demix from input *.vcf files under a folder, filter mutation sites with mutation rate lower than 0.1, filter mutation sites with depth lower than 10, and save result to result.tsv:
 ```sh
-python NextVpower.py -i vcf_example -v -r 0.1 -d 10 -o demix_result_vcf_example.tsv
+python NextVpower.py -i vcf_example -r 0.1 -d 10 -o demix_result_vcf_example.tsv
 ```
 3. Set barcode filter criteria, retain "key" mutation sites present in more than 300 lineages (default 200), filter lineages with fewer than 30 "key" mutation sites (default 20):
 ```sh
@@ -80,11 +80,11 @@ python NextVpower.py -i PP_raw_example.tsv -n 30 -k 300 -o demix_result_example_
 ```
 4. Add annotation to *.vcf files according to variation annotation table and demix:
 ```sh
-python NextVpower.py -i vcf_example -v -o demix_result_vcf_example.tsv --ann_outpath ann_tab_example
+python NextVpower.py -i vcf_example -o demix_result_vcf_example.tsv --ann_outpath ann_tab_example
 ```
 5. Demix from input *.vcf files under a folder, save result in result.tsv, and save middle data to files:
 ```sh
-python NextVpower.py -i vcf_example -v -o demix_result_vcf_example.tsv --vcsample PP_raw_example.tsv --fbarcode MMFF_example.tsv --fsample PPFF_example.tsv --potentials potential_sites_example.tsv
+python NextVpower.py -i vcf_example -o demix_result_vcf_example.tsv --vcsample PP_raw_example.tsv --fbarcode MMFF_example.tsv --fsample PPFF_example.tsv --potentials potential_sites_example.tsv
 ```
 
 Please see detailed usage by running `python NextVpower.py -h` or in [source code](NextVpower.py)
