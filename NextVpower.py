@@ -11,13 +11,13 @@ import argparse
 def _getVpowerArgs():
     parser = argparse.ArgumentParser(description='''Next V-Power, adapted from Virus Phylogenetic Resolver of Wastwater-based Epidemiology (V-Power).''')
     group1 = parser.add_argument_group("Demixing arguments for the demix solver")
-    group1.add_argument('-i', "--input", type=str, help="[File/Dir] path of input sample table file or vcfs folder", required=True)
+    group1.add_argument('-i', "--input", type=str, help="[File/Dir] path of input sample table file, .vcf file or .vcf files under a folder", required=True)
     group1.add_argument('-o', "--output", type=str, help="[File] path of output table file (default: ./demix_result.tsv)", default="demix_result.tsv")
     group1.add_argument('-b', "--barcode", type=str, help="[File] specify a usher_barcodes.csv as input barcode matrix (default: ./resource/usher_barcodes.csv)", default="resource/usher_barcodes.csv")
     group1.add_argument('-l', "--maxlineages", type=int, help="[Int] maximum number of demixing lineages (default: 100)", default=100)
     
     group2 = parser.add_argument_group("Sample Processing arguments for the [--input] sample handler")
-    group2.add_argument('-v', "--vcfs", action='store_true', help="[Flag] parse *.vcf files under input folder")
+    # group2.add_argument('-v', "--vcfs", action='store_true', help="[Flag] parse *.vcf files under input folder")
     group2.add_argument('-r', "--minrate", type=float, help="[Float] filter mutation sites with mutation rate lower than setting threshold in sample vectors (default: 0.0)", default=0.0)
     group2.add_argument('-d', "--mindepth", type=float, help="[Float] filter mutation sites with depth lower than setting threshold in *.vcf files (default: 0.0)", default=0.0)
     group2.add_argument('-a', "--ann_file", type=str, help="[File] specify a var_anno.tsv as input variation annotation table (default: ./resource/var_anno.tsv)", default="resource/var_anno.tsv")
@@ -411,18 +411,28 @@ if __name__ == "__main__":
     if params.ann_outpath != None:
         AnnoDF = readAnnoDF(params.ann_file)
     
-    if params.vcfs:
+    # if params.vcfs:
+    if os.path.isdir(fpath):
         print("Parsing vcf files...", end='')
         Var_DF_Dict = {}
         for fname in collectFile(fpath, fullpath=True, ftype='vcf'):
             VcfDF = convertVcf2DF(fname)
             spname = os.path.basename(fname).split('.', 1)[0]
             Var_DF_Dict[spname] = FilterVcfDF(VcfDF, min_depth=params.mindepth)
-            
             if params.ann_outpath != None:
-                outname = os.path.join(params.ann_outpath, os.path.basename(fname).split('.')[0]+".ann.tsv")
-                AnnTab = BackPasteAnno(VcfDF, AnnoDF, outname)
-        
+                ann_outname = os.path.join(params.ann_outpath, os.path.basename(fname).split('.')[0]+".ann.tsv")
+                AnnTab = BackPasteAnno(VcfDF, AnnoDF, ann_outname)
+        SP_df_raw = CollectSampleVar(Var_DF_Dict, outname=params.vcsample)
+        print("")
+    elif fpath[-4:] == '.vcf':
+        print("Parsing vcf files...", end='')
+        Var_DF_Dict = {}
+        VcfDF = convertVcf2DF(fpath)
+        spname = os.path.basename(fpath).split('.', 1)[0]
+        Var_DF_Dict[spname] = FilterVcfDF(VcfDF, min_depth=params.mindepth)
+        if params.ann_outpath != None:
+            ann_outname = os.path.join(params.ann_outpath, os.path.basename(fpath).split('.')[0]+".ann.tsv")
+            AnnTab = BackPasteAnno(VcfDF, AnnoDF, ann_outname)
         SP_df_raw = CollectSampleVar(Var_DF_Dict, outname=params.vcsample)
         print("")
     else:
