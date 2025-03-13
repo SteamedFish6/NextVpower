@@ -96,9 +96,22 @@ Wastewater multiplex PCR amplicon sequencing revealed community transmission of 
 > [!TIP]
 > How to create VCF files?
 > 
-> - 1.Align sample.reads.fq to NC_045512_Hu-1.fasta (or MN908947.3.fasta) by running `bwa mem`, `samtools sort` and `samtools view`, to generate sample.bam.
+> - 1.Align sample.reads.fq to reference.fa by running `bwa mem`, `samtools sort` and `samtools view`, to generate sample.bam.
 > 
 > - 2.Use variant calling tools ([freebayes](https://github.com/freebayes/freebayes) is recommended) to generate sample.vcf from sample.bam.
+
+Here's an example of demixing using reads file:
+```sh
+bwa index reference.fa
+samtools faidx reference.fa
+bwa mem -t 4 reference.fa sample.reads.fq | samtools view -bS --threads 4 | samtools sort --threads 4 -o sample.bam
+samtools index sample.bam
+freebayes --haplotype-length 0 --pooled-continuous -m 20 -p 1 --strict-vcf -q 13 --min-coverage 10 -F 0.4 -f reference.fa sample.bam | \
+    bcftools annotate --remove ^INFO/TYPE,^INFO/DP,^INFO/RO,^INFO/AO,^INFO/AB,^FORMAT/GT | \
+    bcftools norm -f reference.fa -s -m +any -Ov > sample.vcf
+python NextVpower.py -i sample.vcf -b virus_barcode.csv -o sample.demix_result.tsv
+```
+
 
 Publications
 ------------
