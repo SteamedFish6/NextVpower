@@ -3,6 +3,15 @@ Next V-Power, adapted from "Virus Phylogenetic Resolver of Wastewater-based Epid
 =======
 Next V-Power is a tool for multi-virus lineage demixing from amplicon sequencing data, for wastewater and other mixed samples.
 
+> [!IMPORTANT]
+> (Updated on 2025/3/5) Now we have generated barcode matrixes of multi-virus extracted from [NextClade phylogenetic tree](https://github.com/nextstrain/nextclade_data/tree/release). To specify a barcode matrix, please use parameter `-b` to select a file.
+>
+> Apart from demixing sars-cov-2 with usher_barcodes, you can try demixing other kind of viruses with our new barcode matrixes, including IAV, IBV, hmpv, measles, mpox, rsv, dengue and yellow fever.
+>
+> Prameters `-n` and `-k` may vary for different kind of viruses.
+>
+> Our barcode extracter tool is now under maintaining and the code is coming soon, then you can update barcode matrixes from NextClades source on time!
+
 Basic flow sheet:
 ---------------
 ![image](https://github.com/user-attachments/assets/8471c6cc-c55c-4156-81a8-8c379aaa2b2e)
@@ -43,13 +52,6 @@ tar -zxvf resource.tar.gz
 python NextVpower.py -h
 ```
 
-
-> [!IMPORTANT]
-> (Updated on 2025/3/5) Now we have generated barcode matrixes of multi-virus extracted from [NextClade phylogenetic tree](https://github.com/nextstrain/nextclade_data/tree/release). To specify a barcode matrix, please use `-b` parameter to select a file.
->
-> Apart from demixing sars-cov-2 with usher_barcodes, you can try demixing other kind of viruses with our new barcode matrixes, including IAV, IBV, hmpv, measles, mpox, rsv, dengue and yellow fever.
->
-> Our barcode extracter tool is now under maintaining and the code is coming soon, then you can update barcode matrixes from NextClades source on time!
 
 > [!NOTE]
 > `usher_barcodes.csv` was generated via [Freyja](https://github.com/andersen-lab/Freyja) and this file was copied from [Freyja repository](https://github.com/andersen-lab/Freyja/blob/main/freyja/data/usher_barcodes.csv).
