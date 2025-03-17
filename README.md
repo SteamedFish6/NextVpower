@@ -8,7 +8,7 @@ Next V-Power is a tool for multi-virus lineage demixing from amplicon sequencing
 >
 > Apart from demixing sars-cov-2 with usher_barcodes, you can try demixing other kind of viruses with our new barcode matrixes, including IAV, IBV, hmpv, measles, mpox, rsv, dengue and yellow fever.
 >
-> Prameters `-n` and `-k` may vary for different kind of viruses.
+> Parameters `-n` and `-k` may vary for different kind of viruses.
 >
 > Our barcode extracter tool is now under maintaining and the code is coming soon, then you can update barcode matrixes from NextClades source on time!
 
