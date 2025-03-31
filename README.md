@@ -80,7 +80,7 @@ python NextVpower.py -i vcf_example -r 0.1 -d 10 -o demix_result_vcf_example.tsv
 ```sh
 python NextVpower.py -i PP_raw_example.tsv -n 30 -k 300 -o demix_result_example_300_30.tsv
 ```
-4. Add annotation to *.vcf files according to variation annotation table and demix:
+4. Add annotation to *.vcf files according to variation annotation table and demix (Only for SARS-CoV-2):
 ```sh
 python NextVpower.py -i vcf_example -o demix_result_vcf_example.tsv --ann_outpath ann_tab_example
 ```
