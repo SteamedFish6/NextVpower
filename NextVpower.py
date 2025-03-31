@@ -29,13 +29,13 @@ def _getVpowerArgs():
     group3.add_argument("--merge", action='store_true', help="[--barfilter2 only][Flag] merge lineages with completely identical mutation sites in the barcode matrix")
     
     group4 = parser.add_argument_group("Middle file output arguments for middle processes")
-    group4.add_argument("--ann_outpath", type=str, help="[Dir] if not None, add save the annotated *.vcf table files under a folder (optional)", default=None)
+    group4.add_argument("--ann_outpath", type=str, help="[Dir] if not None, add save the annotated *.vcf table files under a folder (optional, only for sars-cov-2)", default=None)
     group4.add_argument("--vcsample", type=str, help="[File] save the sample table file converted from *.vcf files (optional)", default=None)
     group4.add_argument("--fsample", type=str, help="[File] save the filtered sample table file (optional)", default=None)
     group4.add_argument("--fbarcode", type=str, help="[File] save the filtered barcode matrix file (optional)", default=None)
     group4.add_argument("--potentials", type=str, help="[File] save potential sites not recorded in barcode but present in samples (optional)", default=None)
     
-    parser.add_argument('--version', action='version', version="NextVpower_v0.13")
+    parser.add_argument('--version', action='version', version="NextVpower_v0.14")
     return parser.parse_args()
 
 
