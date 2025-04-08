@@ -8,19 +8,23 @@ import cvxpy as cp
 # from scipy.optimize import minimize, LinearConstraint
 import argparse
 
+Resource_Path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resource")
+Default_Barcode_File = os.path.join(Resource_Path, "usher_barcodes.csv")
+Default_Anno_File = os.path.join(Resource_Path, "var_anno.tsv")
+
 def _getVpowerArgs():
     parser = argparse.ArgumentParser(description='''Next V-Power, adapted from Virus Phylogenetic Resolver of Wastwater-based Epidemiology (V-Power).''')
     group1 = parser.add_argument_group("Demixing arguments for the demix solver")
     group1.add_argument('-i', "--input", type=str, help="[File/Dir] path of input sample table file, .vcf file or .vcf files under a folder", required=True)
     group1.add_argument('-o', "--output", type=str, help="[File] path of output table file (default: ./demix_result.tsv)", default="demix_result.tsv")
-    group1.add_argument('-b', "--barcode", type=str, help="[File] specify a usher_barcodes.csv as input barcode matrix (default: ./resource/usher_barcodes.csv)", default="resource/usher_barcodes.csv")
+    group1.add_argument('-b', "--barcode", type=str, help="[File] specify a usher_barcodes.csv as input barcode matrix (default: NextVpower/resource/usher_barcodes.csv)", default=Default_Barcode_File)
     group1.add_argument('-l', "--maxlineages", type=int, help="[Int] maximum number of demixing lineages (default: 100)", default=100)
     
     group2 = parser.add_argument_group("Sample Processing arguments for the [--input] sample handler")
     # group2.add_argument('-v', "--vcfs", action='store_true', help="[Flag] parse *.vcf files under input folder")
     group2.add_argument('-r', "--minrate", type=float, help="[Float] filter mutation sites with mutation rate lower than setting threshold in sample vectors (default: 0.0)", default=0.0)
     group2.add_argument('-d', "--mindepth", type=float, help="[Float] filter mutation sites with depth lower than setting threshold in *.vcf files (default: 0.0)", default=0.0)
-    group2.add_argument('-a', "--ann_file", type=str, help="[File] specify a var_anno.tsv as input variation annotation table (default: ./resource/var_anno.tsv)", default="resource/var_anno.tsv")
+    group2.add_argument('-a', "--ann_file", type=str, help="[File] specify a var_anno.tsv as input variation annotation table, sars-cov-2 only (default: NextVpower/resource/var_anno.tsv)", default=Default_Anno_File)
     
     group3 = parser.add_argument_group("Barcode Processing arguments for the barcode filter")
     group3.add_argument('-n', "--nsites", type=int, help="[Int] filter lineages with fewer than [Int] mutation sites (default: 20)", default=20)
