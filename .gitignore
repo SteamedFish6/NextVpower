@@ -1,0 +1,8 @@
+*.pyc
+/ann_tab_example
+/vcf_2024
+/vcf_example
+/resource
+\.DS_Store
+\.env
+\.vscode

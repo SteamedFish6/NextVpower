@@ -35,7 +35,7 @@ do
     coverage_file=$stat_path/${sample_name}_${aln_target}.coverage.txt
     bwa mem -t $THREADS $aln_fa $reads1 $reads2 -v 2 | samtools view -bS --threads $THREADS | samtools sort --threads $THREADS -o $bam_fname
     samtools index $bam_fname
-    samtools depth $bam_fname > $depth_file
+    samtools depth -a $bam_fname > $depth_file
     samtools coverage $bam_fname > $coverage_file
     freebayes --haplotype-length 0 --pooled-continuous -m 20 -p 1 --strict-vcf -q 13 --min-coverage 10 -F 0.4 -f $aln_fa $bam_fname | \
     # bcftools view --include 'QUAL>=10 && (FMT/AO)/(FMT/DP)>=0.01' | \
