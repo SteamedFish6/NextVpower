@@ -76,9 +76,9 @@ python NextVpower.py -i PP_raw_example.tsv -o demix_result_example.tsv
 ```sh
 python NextVpower.py -i vcf_example -r 0.1 -d 10 -o demix_result_vcf_example.tsv
 ```
-3. Set barcode filter criteria, retain "key" mutation sites present in more than 300 lineages (default 200), filter lineages with fewer than 30 "key" mutation sites (default 20):
+3. Set barcode filter criteria, filter lineages with fewer than 0.02 of total "key" mutation sites (default 0.01), retain "key" mutation sites present in more than 0.1 of total lineages (default 0.05):
 ```sh
-python NextVpower.py -i PP_raw_example.tsv -n 30 -k 300 -o demix_result_example_300_30.tsv
+python NextVpower.py -i PP_raw_example.tsv -n 0.02 -k 0.1 -o demix_result_example_300_30.tsv
 ```
 4. Add annotation to *.vcf files according to variation annotation table and demix (Only for SARS-CoV-2):
 ```sh
