@@ -23,8 +23,8 @@ def _getVpowerArgs():
     group2 = parser.add_argument_group("Sample Processing arguments for the [--input] sample handler")
     # group2.add_argument('-v', "--vcfs", action='store_true', help="[Flag] parse *.vcf files under input folder")
     group2.add_argument('-r', "--minrate", type=float, help="[Float] filter mutation sites with mutation rate lower than setting threshold in sample vectors (default: 0.0)", default=0.0)
-    group2.add_argument('-d', "--mindepth", type=float, help="[Float] filter mutation sites with depth lower than setting threshold in *.vcf files (default: 0.0)", default=0.0)
-    group2.add_argument('-a', "--ann_file", type=str, help="[File] specify a var_anno.tsv as input variation annotation table, sars-cov-2 only (default: NextVpower/resource/var_anno.tsv)", default=Default_Anno_File)
+    group2.add_argument('-d', "--mindepth", type=int, help="[Int] filter mutation sites with depth lower than setting threshold in *.vcf files (default: 0)", default=0)
+    group2.add_argument('-a', "--ann_file", type=str, help="[File] specify a var_anno.tsv as input variation annotation table (default: NextVpower/resource/var_anno.tsv)", default=Default_Anno_File)
     
     group3 = parser.add_argument_group("Barcode Processing arguments for the barcode filter")
     group3.add_argument('-n', "--nsites_rate", type=float, help="[Float] filter lineages with fewer than [Float] of total mutation sites (default: 0.01)", default=0.01)
@@ -98,55 +98,54 @@ def convertVcf2DF(vcfname: str) -> pd.DataFrame:
                 alt_ls = line_compo[4].split(',')
                 info_list = line_compo[7].split(';')
                 ao_ls = info_list[1].split('=')[1].split(',')
-                ro = eval(info_list[3].split('=')[1])
-                #dp = eval(info_list[2].split('=')[1])
-                # dp = ao + ro #dp = sum(ao_ls) + ro
+                ro = int(info_list[3].split('=')[1])
+                #dp = int(info_list[2].split('=')[1])
+                # dp = ao + ro #dp = sum(map(int, ao_ls)) + ro
                 typ_ls = info_list[4].split('=')[1].split(',')
                 
                 for alt, ao_str, typ in zip(alt_ls, ao_ls, typ_ls):
-                    ao = eval(ao_str)
+                    ao = int(ao_str)
                     maf = ao / (ao + ro) * 100
                     
+                    # split MNP or complex to SNP-like site
                     if typ == 'mnp' or typ == 'complex':
                         ref_alt_len = min(len(ref), len(alt))
                         for i in range(ref_alt_len):
                             s_ref = ref[i]
                             s_alt = alt[i]
-                            s_pos = str(eval(pos_str) + i)
+                            s_pos = str(int(pos_str) + i)
                             s_base_change = s_ref + s_pos + s_alt
                             depth = "{}:{} {}:{}".format(s_alt, ao, s_ref, ro)
                             df.loc[s_base_change] = pd.Series({"Position": s_pos, "Type": typ, "REF Base": s_ref, "ALT Base": s_alt, "Depth": depth, "MAF": maf})
                     
-                    ##fix an issue: convert mutiple INDEL to single INDEL
+                    ##fix an issue: split INDEL to SNP-like site
                     else:
                         if typ == 'del':
-                            alt_len = len(alt)
-                            if alt_len > 1:
-                                s_alt = alt[-1]
-                                s_ref = ref[alt_len-1:]
-                                s_pos = str(eval(pos_str) + alt_len - 1)
-                            else:
-                                s_ref = ref
-                                s_alt = alt
-                                s_pos = pos_str
+                            for i in range(len(alt), len(ref)):
+                                s_ref = ref[i]
+                                s_alt = '-'
+                                s_pos = str(int(pos_str) + i)
+                                s_base_change = s_ref + s_pos + s_alt
+                                depth = "{}:{} {}:{}".format(alt, ao, ref, ro)
+                                df.loc[s_base_change] = pd.Series({"Position": s_pos, "Type": typ, "REF Base": s_ref, "ALT Base": s_alt, "Depth": depth, "MAF": maf})
+                        
                         elif typ == 'ins':
-                            ref_len = len(ref)
-                            if ref_len > 1:
-                                s_ref = ref[-1]
-                                s_alt = alt[ref_len-1:]
-                                s_pos = str(eval(pos_str) + ref_len - 1)
-                            else:
-                                s_ref = ref
-                                s_alt = alt
-                                s_pos = pos_str
+                            for i in range(len(ref), len(alt)):
+                                s_ref = '-'
+                                s_alt = alt[i]
+                                s_pos = str(int(pos_str) + i)
+                                s_base_change = s_ref + s_pos + s_alt
+                                depth = "{}:{} {}:{}".format(alt, ao, ref, ro)
+                                df.loc[s_base_change] = pd.Series({"Position": s_pos, "Type": typ, "REF Base": s_ref, "ALT Base": s_alt, "Depth": depth, "MAF": maf})
+                        
                         else:
                             s_ref = ref
                             s_alt = alt
                             s_pos = pos_str
-                            
-                        s_base_change = s_ref + s_pos + s_alt
-                        depth = "{}:{} {}:{}".format(alt, ao, ref, ro)
-                        df.loc[s_base_change] = pd.Series({"Position": s_pos, "Type": typ, "REF Base": s_ref, "ALT Base": s_alt, "Depth": depth, "MAF": maf})
+                            s_base_change = s_ref + s_pos + s_alt
+                            depth = "{}:{} {}:{}".format(alt, ao, ref, ro)
+                            df.loc[s_base_change] = pd.Series({"Position": s_pos, "Type": typ, "REF Base": s_ref, "ALT Base": s_alt, "Depth": depth, "MAF": maf})
+    
     df["MAF"] = df["MAF"].astype("float64") #change dtype of column in pd.DataFrame
     return df
 
@@ -161,14 +160,14 @@ def BackPasteAnno(vcf_df: pd.DataFrame, anno_df: pd.DataFrame, outname: str=None
         vcf_df.to_csv(outname, sep='\t')
     return vcf_df
 
-def FilterVcfDF(var_df: pd.DataFrame, min_depth=0.0, outname=None) -> pd.DataFrame:
+def FilterVcfDF(var_df: pd.DataFrame, min_depth=0, outname=None) -> pd.DataFrame:
     '''Filter mutation sites with low Depth in VCF DataFrame.
     '''
     if min_depth > 0:
         out_var_df = pd.DataFrame(columns=var_df.columns)
         for idx in var_df.index:
             depth_contents = var_df.loc[idx, 'Depth'].split(' ')
-            depth = eval(depth_contents[0].split(':')[1]) + eval(depth_contents[1].split(':')[1])
+            depth = int(depth_contents[0].split(':')[1]) + int(depth_contents[1].split(':')[1])
             if depth >= min_depth:
                 out_var_df.loc[idx] =var_df.loc[idx]
     else:
