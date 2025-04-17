@@ -27,8 +27,8 @@ def _getVpowerArgs():
     group2.add_argument('-a', "--ann_file", type=str, help="[File] specify a var_anno.tsv as input variation annotation table, sars-cov-2 only (default: NextVpower/resource/var_anno.tsv)", default=Default_Anno_File)
     
     group3 = parser.add_argument_group("Barcode Processing arguments for the barcode filter")
-    group3.add_argument('-n', "--nsites", type=int, help="[Int] filter lineages with fewer than [Int] mutation sites (default: 20)", default=20)
-    group3.add_argument('-k', "--klineages", type=int, help="[Int] retain \"key\" mutation sites present in more than [Int] lineages (default: 200)", default=200)
+    group3.add_argument('-n', "--nsites_rate", type=float, help="[Float] filter lineages with fewer than [Float] of total mutation sites (default: 0.01)", default=0.01)
+    group3.add_argument('-k', "--klineages_rate", type=float, help="[Float] retain \"key\" mutation sites present in more than [Float] of total lineages (default: 0.05)", default=0.05)
     group3.add_argument("--barfilter2", action='store_true', help="[Flag] use old barcode filter to handle barcode matrix")
     group3.add_argument("--merge", action='store_true', help="[--barfilter2 only][Flag] merge lineages with completely identical mutation sites in the barcode matrix")
     
@@ -39,7 +39,7 @@ def _getVpowerArgs():
     group4.add_argument("--fbarcode", type=str, help="[File] save the filtered barcode matrix file (optional)", default=None)
     group4.add_argument("--potentials", type=str, help="[File] save potential sites not recorded in barcode but present in samples (optional)", default=None)
     
-    parser.add_argument('--version', action='version', version="NextVpower_v0.14")
+    parser.add_argument('--version', action='version', version="NextVpower_v0.15")
     return parser.parse_args()
 
 
@@ -154,10 +154,8 @@ def BackPasteAnno(vcf_df: pd.DataFrame, anno_df: pd.DataFrame, outname: str=None
     '''Back paste annotion to VCF DataFrame.
     '''
     using_index = list(set(vcf_df.index) & set(anno_df.index))
-    vcf_df["Region"] = anno_df.loc[using_index, "Region"]
-    vcf_df["Gene ID"] = anno_df.loc[using_index, "Gene ID"]
-    vcf_df["AAC"] = anno_df.loc[using_index, "AAC"]
-    vcf_df["Effect"] = anno_df.loc[using_index, "Effect"]
+    for col_name in anno_df.columns:
+        vcf_df[col_name] = anno_df.loc[using_index, col_name]
     vcf_df.fillna('unknown', inplace=True)
     if outname != None:
         vcf_df.to_csv(outname, sep='\t')
@@ -270,14 +268,16 @@ def FilterBarcode_old(barcode_df: pd.DataFrame, sp_df: pd.DataFrame, lineage_num
         out_barcode_df.to_csv(outname, sep='\t')
     return out_barcode_df
 
-def FilterBarcode(barcode_df: pd.DataFrame, sp_df: pd.DataFrame, key_lineage_num=200, min_sites=20, outname=None) -> pd.DataFrame:
+def FilterBarcode(barcode_df: pd.DataFrame, sp_df: pd.DataFrame, key_lineage_rate=0.05, min_site_rate=0.01, outname=None) -> pd.DataFrame:
     '''Filter Barcode DataFrame. This barcode filter was authored by Kun Yang and adapted by Zhenyu Guo.
     '''
     #column: lineages, row: mutation sites
     site_num = barcode_df.sum(axis=0)
-    barcode_df = barcode_df.loc[:, site_num >= min_sites] #Reserve columns with sum>20
+    min_site_num = int(barcode_df.shape[0] * min_site_rate)
+    barcode_df = barcode_df.loc[:, site_num >= min_site_num] #Reserve columns with sum > 0.01*total_sites
     
     lineage_num = barcode_df.sum(axis=1)
+    key_lineage_num = int(barcode_df.shape[1] * key_lineage_rate)
     key_sites = list(lineage_num.loc[lineage_num >= key_lineage_num].index)
     sample_sites = list(sp_df.index)
     reserved_sites = set(key_sites + sample_sites) #Take the union.
@@ -446,7 +446,7 @@ if __name__ == "__main__":
     if params.barfilter2:
         Barcode_df = FilterBarcode_old(readBarcode(params.barcode), SP_df_raw, lineage_num=params.maxlineages, remove_duplicates=params.merge, outname=params.fbarcode)
     else:
-        Barcode_df = FilterBarcode(readBarcode(params.barcode), SP_df_raw, key_lineage_num=params.klineages, min_sites=params.nsites, outname=params.fbarcode)
+        Barcode_df = FilterBarcode(readBarcode(params.barcode), SP_df_raw, key_lineage_rate=params.klineages_rate, min_site_rate=params.nsites_rate, outname=params.fbarcode)
     SP_df = FilterSPDF(Barcode_df, SP_df_raw, outname=params.fsample, outname_p=params.potentials)
     
     print("\nDemixing...", end=' ')
