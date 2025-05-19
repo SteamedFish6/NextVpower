@@ -33,8 +33,8 @@ def _getVpowerArgs():
     group3.add_argument("--merge", action='store_true', help="[--barfilter2 only][Flag] merge lineages with completely identical mutation sites in the barcode matrix")
     
     group4 = parser.add_argument_group("Middle file output arguments for middle processes")
-    group4.add_argument("--ann_outpath", type=str, help="[Dir] if not None, add save the annotated *.vcf table files under a folder (optional, only for sars-cov-2)", default=None)
     group4.add_argument("--vcsample", type=str, help="[File] save the sample table file converted from *.vcf files (optional)", default=None)
+    group4.add_argument("--ann_vcsample", type=str, help="[File] save the annotated sample table file converted from *.vcf files (optional)", default=None)
     group4.add_argument("--fsample", type=str, help="[File] save the filtered sample table file (optional)", default=None)
     group4.add_argument("--fbarcode", type=str, help="[File] save the filtered barcode matrix file (optional)", default=None)
     group4.add_argument("--potentials", type=str, help="[File] save potential sites not recorded in barcode but present in samples (optional)", default=None)
@@ -149,17 +149,6 @@ def convertVcf2DF(vcfname: str) -> pd.DataFrame:
     df["MAF"] = df["MAF"].astype("float64") #change dtype of column in pd.DataFrame
     return df
 
-def BackPasteAnno(vcf_df: pd.DataFrame, anno_df: pd.DataFrame, outname: str=None) -> pd.DataFrame:
-    '''Back paste annotion to VCF DataFrame.
-    '''
-    using_index = list(set(vcf_df.index) & set(anno_df.index))
-    for col_name in anno_df.columns:
-        vcf_df[col_name] = anno_df.loc[using_index, col_name]
-    vcf_df.fillna('unknown', inplace=True)
-    if outname != None:
-        vcf_df.to_csv(outname, sep='\t')
-    return vcf_df
-
 def FilterVcfDF(var_df: pd.DataFrame, min_depth=0, outname=None) -> pd.DataFrame:
     '''Filter mutation sites with low Depth in VCF DataFrame.
     '''
@@ -196,6 +185,17 @@ def CollectSampleVar(var_df_dict: dict, outname=None) -> pd.DataFrame:
         sp_df.to_csv(outname, sep='\t')
     return sp_df
 
+def BackPasteAnno(sp_df: pd.DataFrame, anno_df: pd.DataFrame, outname: str=None) -> None:
+    '''Back paste annotion to sample DataFrame.
+    '''
+    if outname != None:
+        sp_df_copy = sp_df.copy()
+        site_list = list(sp_df_copy.index)
+        for anno_item in anno_df.columns:
+            anno_item_dict = anno_df[anno_item].to_dict()
+            sp_newcol_dict = {site: anno_item_dict.get(site, '-') for site in site_list}
+            sp_df_copy[anno_item] = sp_newcol_dict
+        sp_df_copy.to_csv(outname, sep='\t')
 
 def FilterSPDF_by_rate(sp_df: pd.DataFrame, min_rate=0.0, outname=None) -> pd.DataFrame:
     '''Filter mutation sites with low mutation rate in Sample DataFrame.
@@ -411,7 +411,7 @@ if __name__ == "__main__":
     params = _getVpowerArgs()
     fpath = params.input
     
-    if params.ann_outpath != None:
+    if params.ann_vcsample != None:
         AnnoDF = readAnnoDF(params.ann_file)
     
     # if params.vcfs:
@@ -422,9 +422,6 @@ if __name__ == "__main__":
             VcfDF = convertVcf2DF(fname)
             spname = os.path.basename(fname).split('.', 1)[0]
             Var_DF_Dict[spname] = FilterVcfDF(VcfDF, min_depth=params.mindepth)
-            if params.ann_outpath != None:
-                ann_outname = os.path.join(params.ann_outpath, os.path.basename(fname).split('.')[0]+".ann.tsv")
-                AnnTab = BackPasteAnno(VcfDF, AnnoDF, ann_outname)
         SP_df_raw = CollectSampleVar(Var_DF_Dict, outname=params.vcsample)
         print("")
     elif fpath[-4:] == '.vcf':
@@ -433,13 +430,12 @@ if __name__ == "__main__":
         VcfDF = convertVcf2DF(fpath)
         spname = os.path.basename(fpath).split('.', 1)[0]
         Var_DF_Dict[spname] = FilterVcfDF(VcfDF, min_depth=params.mindepth)
-        if params.ann_outpath != None:
-            ann_outname = os.path.join(params.ann_outpath, os.path.basename(fpath).split('.')[0]+".ann.tsv")
-            AnnTab = BackPasteAnno(VcfDF, AnnoDF, ann_outname)
         SP_df_raw = CollectSampleVar(Var_DF_Dict, outname=params.vcsample)
         print("")
     else:
         SP_df_raw = FilterSPDF_by_rate(readSampleTable(fpath), min_rate=params.minrate)
+    
+    BackPasteAnno(SP_df_raw, AnnoDF, params.ann_vcsample)
     
     print("Handling barcode matrix and sample matrix...", end='')
     if params.barfilter2:
