@@ -68,7 +68,7 @@ python NextVpower.py -h
 Usage: 
 ---------------
 
-1. Demix from input sample table file, and save result to result.tsv:
+1. Demix from input sample mutation table file, and save result to result.tsv:
 ```sh
 python NextVpower.py -i PP_raw_example.tsv -o demix_result_example.tsv
 ```
@@ -80,9 +80,9 @@ python NextVpower.py -i vcf_example -r 0.1 -d 10 -o demix_result_vcf_example.tsv
 ```sh
 python NextVpower.py -i PP_raw_example.tsv -n 0.02 -k 0.1 -o demix_result_example_300_30.tsv
 ```
-4. Add annotation to *.vcf files according to variation annotation table and demix (Only for SARS-CoV-2):
+4. Add annotation to sample mutation table according to variation annotation table and demix:
 ```sh
-python NextVpower.py -i vcf_example -o demix_result_vcf_example.tsv --ann_outpath ann_tab_example
+python NextVpower.py -i vcf_example -o demix_result_vcf_example.tsv --ann_vcsample Annotated_PP_raw_example.tsv
 ```
 5. Demix from input *.vcf files under a folder, save result in result.tsv, and save middle data to files:
 ```sh
