@@ -109,7 +109,7 @@ class Tree():
             lineage = current.attr_dict["name"]
             phylo_level = current.phylo_level
             
-            nuc_pos_mut_dict = {int(site.strip("ACGT-")): site for site in current.mut_nuc}
+            nuc_pos_mut_dict = {int(site.strip("ACGTN-")): site for site in current.mut_nuc}
             
             for gene in current.mut_aa_dict:
                 if "segments" in gene_dict[gene]:
@@ -167,10 +167,12 @@ def collectTreeAndFastaAndGff(path: str, target_fname='tree.json', fasta_fname='
     collect_dict_fname = {}
     for tup in os.walk(path):
         sub_path, foldername, fname_list = tup
-        for fname in fname_list:
-            if fname == target_fname:
-                collect_dict_fname[sub_path] = [os.path.join(sub_path, fname), os.path.join(sub_path, fasta_fname), os.path.join(sub_path, gff_fname)]
-    
+        # for fname in fname_list:
+        #     if fname == target_fname:
+        #         collect_dict_fname[sub_path] = [os.path.join(sub_path, fname), os.path.join(sub_path, fasta_fname), os.path.join(sub_path, gff_fname)]
+        if target_fname in fname_list and fasta_fname in fname_list and gff_fname in fname_list:
+            collect_dict_fname[sub_path] = [os.path.join(sub_path, target_fname), os.path.join(sub_path, fasta_fname), os.path.join(sub_path, gff_fname)]
+        
     return collect_dict_fname
 
 def convertDict2DF(res_dict: dict) -> pd.DataFrame:
@@ -212,7 +214,9 @@ if __name__ == "__main__":
     
     File_Collection_Dict = collectTreeAndFastaAndGff(Fpath)
     File_Collection_Dict_measles = collectTreeAndFastaAndGff(Fpath, "measles_nextclade.json", "measles_reference_N450.fasta", "measles_reference_N450.gff3")
+    File_Collection_Dict_prrsv1 = collectTreeAndFastaAndGff(Fpath, "tree.json", "lelystad_orf5.fasta", "lelystad_orf5.gff3")
     File_Collection_Dict.update(File_Collection_Dict_measles)
+    File_Collection_Dict.update(File_Collection_Dict_prrsv1)
     
     for Sub_Path in File_Collection_Dict:
         Tree_Fname, Fasta_Fname, Gff_Fname = File_Collection_Dict[Sub_Path]
