@@ -109,7 +109,8 @@ class Tree():
             lineage = current.attr_dict["name"]
             phylo_level = current.phylo_level
             
-            nuc_pos_mut_dict = {int(site.strip("ACGTN-")): site for site in current.mut_nuc}
+            # nuc_pos_mut_dict = {int(site.strip("ACGTN-")): site for site in current.mut_nuc}
+            nuc_pos_mut_dict = {int(site[1:-1]): site for site in current.mut_nuc}
             
             for gene in current.mut_aa_dict:
                 if "segments" in gene_dict[gene]:
