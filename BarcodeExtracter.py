@@ -147,7 +147,7 @@ class Tree():
             if current.mut_nuc:
                 if current.attr_dict["name"] != '0':
                     use_name = info_sepr.join([current.attr_dict[info] for info in use_info]) if use_info else current.attr_dict['name']
-                    # use_name = "{}_{}".format(use_name, phylo_level) ## todo: add `phylo_level` to lineage name
+                    use_name = "{}{}{}".format(use_name, info_sepr, phylo_level) ## todo: add `phylo_level` to lineage name
                     if use_name[:4] != "NODE":
                         res[use_name] = current_abs_mut
             
