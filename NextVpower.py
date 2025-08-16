@@ -197,7 +197,7 @@ def BackPasteAnno(sp_df: pd.DataFrame, anno_df: pd.DataFrame, outname: str=None)
             sp_df_copy[anno_item] = sp_newcol_dict
         sp_df_copy.to_csv(outname, sep='\t')
 
-def FilterSPDF_by_rate(sp_df: pd.DataFrame, min_rate=0.0, outname=None) -> pd.DataFrame:
+def FilterSPDF_by_rate(sp_df: pd.DataFrame, min_rate=0.0) -> pd.DataFrame:
     '''Filter mutation sites with low mutation rate in Sample DataFrame.
     '''
     if min_rate > 0:
@@ -208,8 +208,6 @@ def FilterSPDF_by_rate(sp_df: pd.DataFrame, min_rate=0.0, outname=None) -> pd.Da
                 out_sp_df.loc[site] = rate_contents
     else:
         out_sp_df = sp_df
-    if outname != None:
-        out_sp_df.to_csv(outname, sep='\t')
     return out_sp_df
 
 def FilterBarcode_old(barcode_df: pd.DataFrame, sp_df: pd.DataFrame, lineage_num: int, remove_duplicates=True, outname=None) -> pd.DataFrame:
@@ -433,19 +431,20 @@ if __name__ == "__main__":
         SP_df_raw = CollectSampleVar(Var_DF_Dict, outname=params.vcsample)
         print("")
     else:
-        SP_df_raw = FilterSPDF_by_rate(readSampleTable(fpath), min_rate=params.minrate)
+        SP_df_raw = readSampleTable(fpath)
     
-    BackPasteAnno(SP_df_raw, AnnoDF, params.ann_vcsample)
+    SP_df_filtered = FilterSPDF_by_rate(SP_df_raw, min_rate=params.minrate)
+    BackPasteAnno(SP_df_filtered, AnnoDF, params.ann_vcsample)
     
     print("Handling barcode matrix and sample matrix...", end='')
     if params.barfilter2:
-        Barcode_df = FilterBarcode_old(readBarcode(params.barcode), SP_df_raw, lineage_num=params.maxlineages, remove_duplicates=params.merge, outname=params.fbarcode)
+        Barcode_df = FilterBarcode_old(readBarcode(params.barcode), SP_df_filtered, lineage_num=params.maxlineages, remove_duplicates=params.merge, outname=params.fbarcode)
     else:
-        Barcode_df = FilterBarcode(readBarcode(params.barcode), SP_df_raw, key_lineage_rate=params.klineages_rate, min_site_rate=params.nsites_rate, outname=params.fbarcode)
-    SP_df = FilterSPDF(Barcode_df, SP_df_raw, outname=params.fsample, outname_p=params.potentials)
+        Barcode_df = FilterBarcode(readBarcode(params.barcode), SP_df_filtered, key_lineage_rate=params.klineages_rate, min_site_rate=params.nsites_rate, outname=params.fbarcode)
+    SP_df_final = FilterSPDF(Barcode_df, SP_df_filtered, outname=params.fsample, outname_p=params.potentials)
     
     print("\nDemixing...", end=' ')
-    Out_DF = SolveDemix(SP_df, Barcode_df, max_lineage_num=params.maxlineages)
+    Out_DF = SolveDemix(SP_df_final, Barcode_df, max_lineage_num=params.maxlineages)
     
     Out_DF.to_csv(params.output, sep='\t')
     print("Done.")
