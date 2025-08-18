@@ -409,9 +409,6 @@ if __name__ == "__main__":
     params = _getVpowerArgs()
     fpath = params.input
     
-    if params.ann_vcsample != None:
-        AnnoDF = readAnnoDF(params.ann_file)
-    
     # if params.vcfs:
     if os.path.isdir(fpath):
         print("Parsing vcf files...", end='')
@@ -434,7 +431,9 @@ if __name__ == "__main__":
         SP_df_raw = readSampleTable(fpath)
     
     SP_df_filtered = FilterSPDF_by_rate(SP_df_raw, min_rate=params.minrate)
-    BackPasteAnno(SP_df_filtered, AnnoDF, params.ann_vcsample)
+    if params.ann_vcsample != None:
+        AnnoDF = readAnnoDF(params.ann_file)
+        BackPasteAnno(SP_df_filtered, AnnoDF, params.ann_vcsample)
     
     print("Handling barcode matrix and sample matrix...", end='')
     if params.barfilter2:
