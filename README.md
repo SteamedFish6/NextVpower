@@ -117,7 +117,7 @@ python NextVpower.py -i sample.vcf -b virus_barcode.csv -o sample.demix_result.t
 
 Publications
 ------------
-This project was not published yet —— but you can still have a try on your virus amplicon sequencing data.
+This project was published in [Xiaoyi Lu, Zhenyu Guo, Langjun Tang, Junqiao Zhao, Yonghong Li, Kun Yang, Enhanced wastewater surveillance of respiratory viruses: Unraveling partitioning behavior and demixing co-circulating lineages, Environment International, Volume 204, 2025, 109836, ISSN 0160-4120,](https://doi.org/10.1016/j.envint.2025.109836).
 
 License
 -------
