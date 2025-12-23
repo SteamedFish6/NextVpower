@@ -4,13 +4,18 @@ Next V-Power, adapted from "Virus Phylogenetic Resolver of Wastewater-based Epid
 Next V-Power is a tool for multi-virus lineage demixing from amplicon sequencing data, for wastewater and other mixed samples.
 
 > [!IMPORTANT]
+> (Updated on 2025/12/23) A new version of NextVpower is developed for analyzing universal species of pathogens. It has been validated on Norovirus and Human Adenovirus for lineage demixing capability.
+>
+> The new codes and resource will be released after publication.
+
+> [!IMPORTANT]
 > (Updated on 2025/6/25) Now we have generated barcode matrixes of multi-virus extracted from [NextClade phylogenetic tree](https://github.com/nextstrain/nextclade_data/tree/release). To specify a barcode matrix, please use parameter `-b` to select a file.
 >
 > Apart from demixing sars-cov-2 with usher_barcodes, you can try demixing other kind of viruses with our new barcode matrix, including IAV, IBV, hmpv, measles, mpox, rsv, dengue, prrsv1 and marburgvirus.
 >
 > Parameters `-n` and `-k` may vary for different kind of viruses.
 >
-> Our barcode extracter tool available (see `BarcodeExtracter.py`), then you can update barcode matrixes from NextClades source on time!
+> Our barcode extracter tool is available now (see `BarcodeExtracter.py`), then you can update barcode matrixes from NextClades source on time!
 
 Basic flow sheet:
 ---------------
