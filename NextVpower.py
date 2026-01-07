@@ -415,7 +415,7 @@ if __name__ == "__main__":
         Var_DF_Dict = {}
         for fname in collectFile(fpath, fullpath=True, ftype='vcf'):
             VcfDF = convertVcf2DF(fname)
-            spname = os.path.basename(fname).split('.', 1)[0]
+            spname = os.path.basename(fname).rsplit('.', 1)[0]
             Var_DF_Dict[spname] = FilterVcfDF(VcfDF, min_depth=params.mindepth)
         SP_df_raw = CollectSampleVar(Var_DF_Dict, outname=params.vcsample)
         print("")
@@ -423,7 +423,7 @@ if __name__ == "__main__":
         print("Parsing vcf files...", end='')
         Var_DF_Dict = {}
         VcfDF = convertVcf2DF(fpath)
-        spname = os.path.basename(fpath).split('.', 1)[0]
+        spname = os.path.basename(fpath).rsplit('.', 1)[0]
         Var_DF_Dict[spname] = FilterVcfDF(VcfDF, min_depth=params.mindepth)
         SP_df_raw = CollectSampleVar(Var_DF_Dict, outname=params.vcsample)
         print("")
